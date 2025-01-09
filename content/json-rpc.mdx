@@ -1,0 +1,79 @@
+
+# JSON-RPC
+
+## Reason of use
+
+- independent of language 
+- independent of platform
+
+## Use case
+
+- language server protocol
+
+>  request 
+```json
+{
+    "jsonrpc": "2.0",
+    "id" : 1,
+    "method": "textDocument/definition",
+    "params": {
+        "textDocument": {
+            "uri": "file:///p%3A/mseng/VSCode/Playgrounds/cpp/use.cpp"
+        },
+        "position": {
+            "line": 3,
+            "character": 12
+        }
+    }
+}
+```
+
+> response
+```json
+{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+        "uri": "file:///p%3A/mseng/VSCode/Playgrounds/cpp/provide.cpp",
+        "range": {
+            "start": {
+                "line": 0,
+                "character": 4
+            },
+            "end": {
+                "line": 0,
+                "character": 11
+            }
+        }
+    }
+}
+```
+
+- blockchain node communication
+- communication between different languages
+
+```javascript
+// JSON-RPC 요청 바디
+const requestBody = {
+  jsonrpc: "2.0",
+  method: "myMethod",
+  params: { foo: "bar" },
+  id: 1
+};
+
+// Axios로 POST 요청
+const response = await axios.post(
+  'https://example.com/jsonrpc',
+  requestBody,
+  {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }
+);
+```
+
+## Faults
+
+- overhead of serialization/deserialization
+- strongly connected 
