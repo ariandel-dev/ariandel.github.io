@@ -1,0 +1,43 @@
+## Sinon 사용법 정리
+
+### Spy
+
+- Wrapper
+
+  - 함수 호출 횟수 확인
+  - 함수 호출 시 인자 확인
+  - 함수 호출 시 리턴 값 확인
+
+```javascript
+const spyCount = sinon.spy();
+
+spyCount();
+spyCount();
+spyCount();
+
+console.log(spyCount.callCount); // 3
+```
+
+```javascript
+sinon.spy(jQuery, 'ajax');
+
+console.log(jQuery.ajax.calledOnce); // true
+```
+
+### Stub
+
+- 기본 동작 오버라이드
+```javascript
+const err = new Error('Ajax Error');
+
+sinon.stub(jQuery, 'ajax').throws(err);
+
+jQuery.ajax(); // Error: Ajax Error
+```
+
+### Mock
+
+- Expect
+```javascript
+sinon.mock(jQuery).expects('ajax').atLeast(1).atMost(3).throws(err);
+```
