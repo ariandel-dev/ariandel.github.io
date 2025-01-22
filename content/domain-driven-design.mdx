@@ -1,0 +1,42 @@
+## 도메인 주도 설계
+
+### 컨텍스트
+
+각 컨텍스트는 해당 컨텍스트에 관련된 고유의 엔티티, 애그리거트, 서비스, 값 객체 등으로 구성된 도메인 모델을 갖습니다.
+
+#### 엔티티
+
+엔티티는 비즈니스 도메인 내 특정 개념과 관련된 데이터와 행동을 모두 캡슐화합니다
+
+
+
+#### 애그리거트
+
+
+#### 서비스
+
+도메인에서 서비스는 특정 작업을 수행하는 무상태(stateless) 작업입니다.
+
+### 컨텍스트 맵
+
+#### OHS
+
+Open Host Service
+
+#### ACL
+
+Anti Corruption Layer
+
+#### 예시
+
+검색시스템은 상품검색, 유저검색, 주문검색등 여러곳에서 필요하다.
+
+이경우 상품, 유저, 주문이 컨텍스트가 되고 해당 컨텍스트에 연결할 서비스가 검색 또한 컨텍스트가 된다.
+
+- User Context에서는 가입, 탈퇴, 권한, 신고/정지, 프로필 변경 등 **사용자 자체**에 대한 비즈니스 규칙과 상태 변화를 관리.
+
+Search Context → (OHS를 호출) → User Context
+“userId 목록에 해당하는 유저들의 nickname, email, status, kyc 정보만 주세요”    
+
+User Context → (ACL 변환) → Search Context
+“UserContext.User” 엔티티 → “SearchContext.UserDocument” (or “UserDTO”)로 변환, Search Context가 필요로 하는 필드만 전달

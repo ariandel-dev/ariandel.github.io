@@ -1,3 +1,27 @@
 ## api 분리기준..
 
-조건문 한줄 밖에 안된다고 치더라도 묶여있는 형태의 api요청 설계는 목적에 필요없는 로직을 거쳐가야할 수 있다. 이런점을 생각하면 각각 다른 api요청으로 처리하는게 좋을 것 같다.
+[관련 글](https://okky.kr/articles/795157)
+
+한페이지에서 비슷한 데이터를 차트와 표형식으로 보여준다고 할때
+이를 분리해야하는가.
+
+해결하기 위해서 나온 대안이 GraphQL 이다.
+
+## SLA
+
+95 ~ 99 Percentile 기준으로 응답시간이 500ms를 넘으면 안됩니다. 
+
+## REST vs GraphQL
+
+REST의 경우는 Relation을 payload에 같이 포함시킬 경우, Principle을 위반하게 됩니다.   
+GraphQL은 Relation을 포함하는 것이죠.
+
+GraphQL의 기본 개념은 API를 호출하는 Client에게 책임을 넘김으로 인해 좀 더 유연한 개발을 위함
+
+---
+
+각각의 API를 나누면서 클라이언트에서 여러개 API가 동시 호출되면서 성능 문제가 발생시키는데
+
+이런 문제를 해결하기위한 방법으로 위에서 언급된 GraphQL과 Server side rendering, 그리고 
+
+API 서버 앞단에 관리자페이지를 위한 Server(BFF)를 구축하는 방법들이 있습니다. 
