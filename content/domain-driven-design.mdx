@@ -40,3 +40,66 @@ Search Context → (OHS를 호출) → User Context
 
 User Context → (ACL 변환) → Search Context
 “UserContext.User” 엔티티 → “SearchContext.UserDocument” (or “UserDTO”)로 변환, Search Context가 필요로 하는 필드만 전달
+
+
+#### 프로젝트 적용
+
+프로젝트 규모에 비해서 과도한 적용은 오히려 복잡도를 높히니 필요한 수준에서만 구현하는게 좋다.
+
+> User Context 예시
+```javascript
+// UserContext (Application Service 예시)
+export class UserService {
+  constructor(
+    private userRepository: UserRepository,
+    // ...
+  ) {}
+
+  // OHS로 제공되는 메서드
+  public async findUsersForSearch(params: SearchUserParam): Promise<SearchUserDTO[]> {
+    // 1) 도메인 로직/유효성 체크 등
+    // 2) userRepository.findBy(params) 등으로 DB 조회
+    // 3) 결과를 SearchUserDTO로 매핑 후 리턴
+  }
+}
+```
+
+> Search Context 예시
+```javascript
+// SearchContext
+export class SearchService {
+  constructor(
+    private userSearchRepository: UserSearchRepository,
+    // ...
+  ) {}
+
+  // 예: User 검색
+  public async searchUsers(keyword: string, page, limit, ...): Promise<UserSearchResult> {
+    // 만약 Search DB(ElasticSearch 등)를 구축해놨다면 여기서 검색
+    // 또는, UserContext의 findUsersForSearch()를 RPC/HTTP로 호출해서 검색 결과 받기
+  }
+
+  // 예: Channel 검색
+  public async searchChannels(...) { ... }
+}
+```
+
+현재 예제 코드(getUsers(), VideoHistoryModel.aggregate(), …)는 “User와 VideoHistory(시청 이력)를 합쳐서 검색/통계”를 하는 로직이 한 파일에 몰려 있습니다.
+
+이를 DDD 관점에서 분할하려면:
+
+> UserContext:
+
+User, KYC 등 관리   
+“유저 상태”, “신고/삭제 여부” 등  
+
+> VideoHistoryContext(또는 “ReportContext”)  
+
+시청 이력, 뷰(View), 포인트(Point) 등 관리 
+
+> SearchContext:  
+
+두 Context에서 공개된 API or 도메인 이벤트를 통해, 필요한 데이터를 가져와 검색/통계/쿼리를 전담.  
+지금처럼 MongoDB Aggregation으로 한 번에 조인 하는 대신,  
+SearchContext가 별도 인덱스를 구축할 수도 있고,  
+또는 두 Context 각각 DB를 조회해서 결과를 머지(merge)하는 로직을 둘 수도 있음.
