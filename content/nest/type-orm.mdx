@@ -1,0 +1,36 @@
+### Data Mapper
+
+[link](https://github.com/typeorm/typeorm/blob/master/docs/active-record-data-mapper.md#what-is-the-data-mapper-pattern)
+Simply said, data mapper is an approach to access your database within repositories instead of models.
+
+#### extending repository
+
+```typescript
+export const UserRepository = dataSource.getRepository(User).extend({
+    findByName(firstName: string, lastName: string) {
+        return this.createQueryBuilder("user")
+            .where("user.firstName = :firstName", { firstName })
+            .andWhere("user.lastName = :lastName", { lastName })
+            .getMany()
+    },
+})
+```
+
+#### with transactions
+
+트랜잭션도 그냥 쿼리빌더로 해결 가능하다 그렇게 사용하자.
+
+Transactions have their own scope of execution: they have their own query runner, entity manager and repository instances.   
+That's why using global (data source's) entity manager and repositories won't work in transactions
+
+```typescript
+await connection.transaction(async (manager) => {
+    // in transactions you MUST use manager instance provided by a transaction,
+    // you cannot use global entity managers or repositories,
+    // because this manager is exclusive and transactional
+
+    const userRepository = manager.withRepository(UserRepository)
+    await userRepository.createAndSave("Timber", "Saw")
+    const timber = await userRepository.findByName("Timber", "Saw")
+})
+```

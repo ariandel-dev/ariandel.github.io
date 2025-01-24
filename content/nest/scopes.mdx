@@ -1,0 +1,36 @@
+### Injection
+
+For people coming from different programming language backgrounds, it might be unexpected to learn that in Nest, ***almost everything is shared across incoming requests***.
+
+ Remember that Node.js doesn't follow the request/response Multi-Threaded Stateless Model in which every request is processed by a separate thread. Hence, using singleton instances is fully safe for our applications.
+
+ ### Provider Scope
+
+ 꼭 필요한 상황이 아니라면 디폴트가 좋긴하다 성능상.
+ 
+Although it all sounds quite intimidating, a properly designed application that leverages request-scoped providers should not slow down by more than ~5% latency-wise.
+
+
+ > Default
+
+A single instance of the provider is shared across the entire application. The instance lifetime is tied directly to the application lifecycle.
+
+ > Request
+
+ A new instance of the provider is created exclusively for each incoming request
+
+ > Transient
+
+Each consumer that injects a transient provider will receive a new, dedicated instance.
+
+### Scope Hierarchy
+
+> Request
+
+The REQUEST scope bubbles up the injection chain.
+
+Imagine the following dependency graph: CatsController <- CatsService <- CatsRepository. If CatsService is request-scoped (and the others are default singletons), ***the CatsController will become request-scoped as it is dependent on the injected service***. The CatsRepository, which is not dependent, would remain singleton-scoped.
+
+> Transient
+
+If a singleton-scoped DogsService injects a transient LoggerService provider, it will receive a fresh instance of it. However, DogsService will stay singleton-scoped
