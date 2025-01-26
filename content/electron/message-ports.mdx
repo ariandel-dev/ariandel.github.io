@@ -1,0 +1,28 @@
+### 내용
+
+```javascript
+// MessagePorts are created in pairs. A connected pair of message ports is
+// called a channel.
+const channel = new MessageChannel()
+
+// The only difference between port1 and port2 is in how you use them. Messages
+// sent to port1 will be received by port2 and vice-versa.
+const port1 = channel.port1
+const port2 = channel.port2
+
+// It's OK to send a message on the channel before the other end has registered
+// a listener. Messages will be queued until a listener is registered.
+port2.postMessage({ answer: 42 })
+
+// Here we send the other end of the channel, port1, to the main process. It's
+// also possible to send MessagePorts to other frames, or to Web Workers, etc.
+ipcRenderer.postMessage('port', null, [port1])
+```
+
+In the renderer, the MessagePort class behaves exactly as it does on the web. 
+
+The main process is not a web page, though—it has no Blink integration—and so it does not have the MessagePort or MessageChannel classes. In order to handle and interact with MessagePorts in the main process, Electron adds two new classes: **MessagePortMain** and **MessageChannelMain**.
+
+MessagePort objects can be created in either the renderer or the main process, and passed back and forth using the ipcRenderer.postMessage and WebContents.postMessage methods.
+
+Note that the usual IPC methods like send and invoke cannot be used to transfer MessagePorts, only the postMessage methods can transfer MessagePorts.

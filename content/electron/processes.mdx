@@ -1,0 +1,101 @@
+### 메모
+
+```typescript
+import { app, BrowserWindow } from 'electron';
+```
+Electron follows typical JavaScript conventions here, where PascalCase modules are instantiable class constructors (e.g. BrowserWindow, Tray, Notification) whereas camelCase modules are not instantiable (e.g. app, ipcRenderer, webContents).
+
+### Main Process
+
+The executable runs the JavaScript entry point found in the main property of your package.json.   
+This file controls Electron's main process, which runs an instance of Node.js and is responsible for   
+
+- your app's lifecycle, 
+- displaying native interfaces, 
+- performing privileged operations, 
+- and managing renderer processes.
+
+### Renderer Process
+
+Chromium 기반 브라우저에서 실행되는 개별 프로세스
+
+보안상 Node.js API 사용이 기본적으로 제한됨
+preload.js를 통해 특정 기능을 안전하게 사용할 수 있음
+
+하나의 랜더러 프로세스가 멈춰도 전체 앱이 멈추지 않음.
+
+#### Preload
+
+> Preload scripts contain code that **executes in a renderer process** before its web content begins loading.
+
+Preload scripts are similar to a **Chrome extension's content scripts**.
+
+To add features to your renderer that require privileged access, you can define global objects through the contextBridge API.
+
+**샌드박싱**은 실행 환경을 제한하여 프로세스가 시스템의 중요한 부분에 접근하지 못하도록 격리하는 보안 기술입니다.
+
+> If you're developing an **Electron wrapper** for an existing web app hosted on a remote URL, you can add custom properties onto the renderer's window global that can be used for **desktop-only logic** on the web client's side.
+
+웹뷰 앱과 비슷하게 데스크톱 앱도 빌드 가능하긴 할듯.
+
+#### IPC
+
+Electron에서는 메인 프로세스와 렌더러 프로세스가 직접적으로 접근할 수 없기 때문에, IPC (Inter-Process Communication) 모듈을 사용해 데이터를 주고받아야 합니다.
+
+
+```typescript
+import { contextBridge, ipcRenderer } from "electron";
+
+contextBridge.exposeInMainWorld('versions', {
+  node: () => process.versions.node,
+  chrome: () => process.versions.chrome,
+  electron: () => process.versions.electron,
+  ping: () => ipcRenderer.invoke('ping')
+  // we can also expose variables, not just functions
+})
+```
+
+ipcRenderer를 공유해버리면 renderer 프로세스가 메인 프로세스에 임의의 IPC 메시지를 보낼 수 있게 되어 보안상 문제가 된다.
+
+### Utility Process
+
+The utility process can be used to host for example: **untrusted services, CPU intensive tasks or crash prone components** which would have previously been hosted in the main process or process **spawned with Node.js child_process.fork API**. 
+
+아.. 불안정산 태스크는 안정성을 위해서 의도적으로 포크를 통해 실행하는 방법도 존재하겠구나.
+
+**CPU 집약적인 작업**(예: 이미지/비디오 처리, AI 연산, 대용량 데이터 처리)을 메인 프로세스에서 실행하면 UI 렌더링이 느려질 수 있음.
+
+외부 API 요청, 네트워크 통신, 비신뢰 코드 실행을 메인 프로세스에서 실행하면 보안 위험이 증가함. 별도의 샌드박스된 프로세스에서 실행하면 보안성이 향상됨.
+
+#### orphan 조건
+
+> 자식 프로세스가 detached: true 옵션으로 생성된 경우
+
+```javascript
+const { spawn } = require("child_process");
+
+const child = spawn("node", ["worker.js"], {
+  detached: true, // 부모와 분리됨
+  stdio: "ignore",
+});
+
+child.unref(); // 부모 프로세스와 완전히 분리
+```
+
+> 메인 프로세스가 비정상 종료되는 경우 (예: kill -9 또는 크래시)
+
+> Windows 환경에서 child_process.spawn()을 사용하여 실행한 경우
+
+#### 안전하게 종료하는 방법
+
+Utility Process를 사용하면 기본적으로 안전하지만 node의 child_process.fork API를 사용하면 고려해야하는 부분임.
+
+exit 이벤트에서 자식 프로세스 종료
+```javascript
+let child = fork(path.join(__dirname, "worker.js"));
+
+app.on("will-quit", () => {
+  console.log("Closing child process...");
+  child.kill(); // 안전하게 종료
+});
+```
