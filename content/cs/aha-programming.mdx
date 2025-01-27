@@ -1,0 +1,23 @@
+### 블로그 글 정리
+
+#### 출처
+
+[Avoid Hasty Abstractions](https://kentcdodds.com/blog/aha-programming)
+[Wrong Abstractions](hhttps://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
+
+과한 추상화는 가독성을 현저히 떨어뜨린다.   
+협업을 힘들게하고 유지보수가 어렵다.
+
+#### WET
+
+Write Everything Twice.
+
+In that same codebase I mentioned above, there was some **over-abstraction that was even more harmful than duplication**. It was AngularJS code and for several AngularJS controllers, the code passed this to a function which would monkey-patch methods and properties onto this in a way enhancing the controller instance with certain abilities.
+
+적절한 레벨의 추상화를 할 자신이 없다면 우선 중복을 허용하자. 그편이 낫다.
+
+#### AHA
+
+Avoid Hasty Abstractions.
+
+Dry, Wet 처럼 

@@ -1,0 +1,92 @@
+#### 자바스크립트 인터프리터 작동방식
+
+자바스크립트 코드를 실행시킬 때, 인터프리터(interpreter)는 코드를 두번 훓어봅니다.
+
+처음에는 코드가 안전한지 체크를 하고 작은 부분에 있어서 최적화를 할 수 있는지 훓어봅니다. 안전 체크라는 말은 구문이 올바르게 작성되었는지 혹은 eval이나 with가 쓰였는지 등등 체크하는 것을 뜻합니다.
+
+그리고나서, 인터프리터는 코드가 실행되었을때 더 나은 퍼포먼스를 위해 최선을 다해 성능 최적화를 실행합니다. 그리고 이 부분에서 호이스팅이 발생합니다. 이 부분은 또한 컴파일런(compile run)이라고 합니다.
+
+호이스팅이란 자바스크립트 인터프리터가 모든 변수와 함수 선언을 현재 스코프의 맨 위로 올렸을때 발생합니다. 실제적으로 선언이된 부분들만이 호이스팅이되며 **할당된 부분들은 그 자리에 남아있다는것**은 굉장히 중요합니다.
+
+#### 변수에서의 작동방식
+
+```javascript
+"use strict";
+console.log(bar);
+var bar = "bar";
+console.log(bar);
+```
+
+```javascript
+"use strict";
+var bar;
+console.log(bar); // undefined
+bar = "bar";
+console.log(bar); // 'bar'
+```
+
+#### 함수에서의 작동방식
+
+```javascript
+"use strict";
+
+foo();
+function foo() {
+  console.log(bam); // undefined
+  var bam = "bam";
+}
+
+console.log(bam);
+```
+
+```javascript
+"use strict";
+
+function foo() {
+  var bam;
+  console.log(bam); // undefined
+  bam = "bam";
+}
+
+foo();
+console.log(bam); // ReferenceError: bam is not defined
+```
+
+bam은 현재 스코프의 맨 위로 호이스팅 됩니다. 이 말은 전역 스코프에 선언되있는것이 아닌 함수 스코프 안에 선언되었다는것을 뜻합니다.
+
+#### 우선순위 
+
+> 변수보다 함수 선언문이 더 위에서 호이스팅 됩니다.
+
+```javascript
+"use strict";
+
+console.log(typeof foo); // function
+
+var foo = "foo";
+
+function foo() {
+  var bam = "bam";
+  console.log(bam); // bam
+}
+```
+
+```javascript
+"use strict";
+
+function foo() {
+  var bam = "bam";
+  console.log(bam);
+}
+
+console.log(typeof foo); // 'function'
+foo = "foo";
+```
+
+#### ES6
+
+호이스팅은 위에서 보던 var 변수와 다르게 let과 const 변수에서 발생하지 않습니다.   
+라고 알기 쉽지만 실제로 컴파일런과정에서 호이스팅이 되긴한다. 접근이 안될뿐.
+
+[ES6 DOCS](https://tc39.es/ecma262/#sec-let-and-const-declarations)   
+변수는 자기자신을 포함하는 lexical 환경이 인스턴스화 될 때 생성되지만 변수의 lexicalBinging 평가 과정이 끝나기 전 까지는 접근할 수 없습니다.

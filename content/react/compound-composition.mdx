@@ -1,0 +1,150 @@
+### 내용
+
+조합 패턴을 응용해서 깔끔한 추상화를 구현
+```javascript
+function Page() {
+  const [tab, setTab] = React.useState(initialTab)
+
+  return (
+    <Tabs
+      items={tabItems}
+      onSelectTab={setTab}
+      selectedTab={tab}
+    />
+  )
+}
+```
+
+```javascript
+function Page() {
+  const [selectedTab, setTab] = React.useState(initialTab)
+
+  return (
+    <Tabs>
+      {tabItems.map(tabItem => (
+        <Tabs.Item
+          value={tabItem}
+          isSelected={selectedTab === tabItem}
+          onSelect={setTab}
+        >
+          {tabItem}
+        </Tabs.Item>
+      ))}
+    </Tabs>
+  )
+}
+```
+
+이제 탭 컴포넌트 안에 다른 컴포넌트를 삽입하는 요청도 무리 없이 수행할 수 있음.
+
+그런데 위에서 이야기했듯이 Compound Components는 State를 숨길 수 있다는 장점도 갖고있다.
+
+```javascript
+function Page() {
+  return (
+    <Tabs>
+      {tabItems.map(tabItem => (
+        <Tabs.Item value={tabItem}>
+          {tabItem}
+        </Tabs.Item>
+      ))}
+    </Tabs>
+  )
+}
+
+...
+
+// Tabs.jsx
+import React from 'react'
+
+function Tabs({ children }) {
+  const [selectedTab, setTab] = React.useState(initialTab)
+
+  return (
+    <ul className="tab-container">
+      {React.Children.map(children, child => (
+        React.cloneElement(child, {
+          isSelected: child.props.value === selectedTab,
+          onSelect: () => setTab(child.props.value),
+        })
+      ))}
+    </ul>
+  )
+}
+
+Tabs.Item = ({ isSelected, onSelect, children }) => (
+  <li
+    onClick={onSelect}
+    className={`tab-item ${isSelected ? 'selected' : ''}`}
+  >
+    {children}
+  </li>
+)
+```
+
+그런데 Tabs 컴포넌트에는 한 가지 아쉬운 점이 있습니다. <Tabs> 에서 cloneElement 를 사용하고 있기 때문에 **<Tabs.Item> 이 Tabs 의 바로 아래 자식으로 와야한다 라는 규칙**이 생깁니다.
+
+### Context를 이용한 개선
+
+```javascript
+// Tabs.jsx
+import React from 'react'
+
+const TabContext = React.createContext()
+
+function Tabs({ children }) {
+  const [selectedTab, setTab] = React.useState(initialTab)
+
+  return (
+    <TabContext.Provider value={{ selectedTab, setTab }}>
+      <ul className="tab-container">
+        {children}
+      </ul>
+    </TabContext.Provider>
+  )
+}
+
+Tabs.Item = ({ value, children }) => {
+  const ctx = React.useContext(TabContext)
+  if (ctx === undefined) {
+    throw new Error('<Tabs.Item> 컴포넌트는 <Tabs> 컴포넌트 아래에서만 사용될 수 있습니다.')
+  }
+  const { selectedTab, setTab } = ctx
+  
+  return (
+    <li
+      onClick={() => setTab(value)}
+      className={`tab-item ${selectedTab === value ? 'selected' : ''}`}
+    >
+      {children}
+    </li>
+  )
+}
+
+```
+
+### Render Props를 이용한 개선
+
+Render Props는 Hooks가 나오기 이전에 리액트 컴포넌트의 상태관리 로직을 추상화하는 방법으로 자주 사용되던 패턴입니다.
+```javascript
+function Tabs({ children }) {
+  const [selectedTab, setTab] = React.useState(initialTab)
+
+  return (
+    <ul className="tab-container">
+      {children(selectedTab, setTab)}
+    </ul>
+  )
+}
+
+Tabs.Item = ({ isSelected, onSelect, children }) => (
+  <li
+    onClick={onSelect}
+    className={`tab-item ${isSelected ? 'selected' : ''}`}
+  >
+    {children}
+  </li>
+)
+```
+
+<Tabs>가 children을 함수로 선언하고 return 문에서 state를 넣어 호출해주고 있기 때문에 <Tabs>를 사용하는 페이지에서 <Tabs> 내부에 있는 state를 쓸 수 있도록 만들어 주었습니다. 
