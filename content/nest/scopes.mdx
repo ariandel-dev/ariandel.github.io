@@ -11,26 +11,26 @@ For people coming from different programming language backgrounds, it might be u
 Although it all sounds quite intimidating, a properly designed application that leverages request-scoped providers should not slow down by more than ~5% latency-wise.
 
 
- > Default
+ {'>'} Default
 
 A single instance of the provider is shared across the entire application. The instance lifetime is tied directly to the application lifecycle.
 
- > Request
+ {'>'} Request
 
  A new instance of the provider is created exclusively for each incoming request
 
- > Transient
+ {'>'} Transient
 
 Each consumer that injects a transient provider will receive a new, dedicated instance.
 
 ### Scope Hierarchy
 
-> Request
+{'>'} Request
 
 The REQUEST scope bubbles up the injection chain.
 
-Imagine the following dependency graph: CatsController <- CatsService <- CatsRepository. If CatsService is request-scoped (and the others are default singletons), ***the CatsController will become request-scoped as it is dependent on the injected service***. The CatsRepository, which is not dependent, would remain singleton-scoped.
+Imagine the following dependency graph: CatsController {'<-'} CatsService {'<-'} CatsRepository. If CatsService is request-scoped (and the others are default singletons), ***the CatsController will become request-scoped as it is dependent on the injected service***. The CatsRepository, which is not dependent, would remain singleton-scoped.
 
-> Transient
+{'>'} Transient
 
 If a singleton-scoped DogsService injects a transient LoggerService provider, it will receive a fresh instance of it. However, DogsService will stay singleton-scoped
