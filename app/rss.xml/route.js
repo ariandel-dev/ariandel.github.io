@@ -1,4 +1,4 @@
-import { getPosts } from '../posts/get-posts.js'
+import { getFlatPosts } from '../posts/get-posts.js'
  
 const CONFIG = {
   title: 'Ariandel Blog',
@@ -6,9 +6,11 @@ const CONFIG = {
   description: 'Latest blog posts',
   lang: 'en-us'
 }
+
+export const dynamic = 'force-static';
  
 export async function GET() {
-  const allPosts = await getPosts()
+  const allPosts = await getFlatPosts()
   const posts = allPosts
     .map(
       post => `    <item>
