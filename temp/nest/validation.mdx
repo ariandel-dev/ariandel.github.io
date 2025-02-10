@@ -1,0 +1,19 @@
+### pipe
+
+When importing your DTOs, you can't use a type-only import as that would be erased at runtime, 
+i.e. remember to `import { CreateUserDto } instead` of `import type { CreateUserDto }`
+
+직접 controller에서 추가해도 괜찮지만 데코레이터를 사용하면 DTO를 정의하는 부분에서 추가 가능하다.
+
+이편이 가독성 측면에서도 더 뛰어날 듯 하다.
+
+```javascript
+// 이렇게 코드 블록으로 감싸서 예제 코드를 보여줍니다
+class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+}
+```

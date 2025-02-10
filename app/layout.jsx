@@ -21,7 +21,7 @@ export default async function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <Head backgroundColor={{ dark: '#0f172a', light: '#fefce8' }} />
       <body>
-        <Layout banner={banner}>
+        <Layout>
           <Navbar pageMap={await getPageMap()}>
             <Search />
             <ThemeSwitch />
