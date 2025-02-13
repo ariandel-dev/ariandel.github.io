@@ -1,0 +1,19 @@
+---
+author: ariandel
+date: 2025-02-12
+description: "tsconfig.json 설정"
+tags: ["typescript", "node", "development"]
+title: "tsconfig.json 설정"
+---
+
+
+
+### Module Resolution
+
+`node16/nodenext` - 노드로만 실행하는 경우 node16 또는 nodenext를 쓰는것이 좋다. 
+이경우 modules 속성값에 맞춰서 컴파일해준다.
+
+`node10/node` - 모두 commonjs 모듈로 컴파일해준다.
+
+`bundler` - vite나 webpack 같은 번들러 쓰는 경우 쓰면된다.
+import할때 확장자를 포함하지 않아도 되어서 좋다.

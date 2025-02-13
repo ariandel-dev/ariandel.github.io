@@ -1,0 +1,17 @@
+{
+  "Insert Frontmatter": {
+    "prefix": "frontmatter",
+    "body": [
+      "---",
+      "author: ariandel",
+      "date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "description: ${1:설명 입력}",
+      "tags: [${2:태그목록}]",
+      "title: ${3:제목 입력}",
+      "---",
+      "",
+      "$0"
+    ],
+    "description": "빠르게 Frontmatter 추가"
+  }
+}

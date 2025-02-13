@@ -1,5 +1,5 @@
 import { PostCard } from 'nextra-theme-blog'
-import { getFlatPosts, getTags } from '../../posts/get-posts'
+import { getTags, getPosts } from '../../posts/get-posts'
  
 export async function generateMetadata(props) {
   const params = await props.params
@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 export default async function TagPage(props) {
   const params = await props.params
   const { title } = await generateMetadata({ params })
-  const posts = await getFlatPosts()
+  const posts = await getPosts()
   return (
     <>
       <h1>{title}</h1>

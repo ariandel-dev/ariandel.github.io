@@ -6,19 +6,15 @@ export async function getPosts() {
     list: await getPageMap(),
     route: '/content'
   });
-  return directories
-    .filter(post => post.name !== 'index' && post.name !== 'posts')
-    .sort((a, b) => new Date(b.frontMatter.date) - new Date(a.frontMatter.date))
-}
 
-export async function getFlatPosts() {
-  const posts = await getPosts();
-  const flatPosts = posts.flatMap(post => post.children ? post.children : post);
-  return flatPosts;
+  return directories
+    .flatMap(post => post.children ? post.children : post)
+    .filter(post => post.name !== 'index' && post.name !== 'posts')
+    .sort((a, b) => b.frontMatter.date.localeCompare(a.frontMatter.date)) 
 }
  
 export async function getTags() {
-  const flatPosts = await getFlatPosts();
+  const flatPosts = await getPosts();
   const tags = flatPosts.flatMap(post => post.frontMatter.tags)
   return tags
 }

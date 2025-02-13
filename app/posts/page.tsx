@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { PostCard } from 'nextra-theme-blog'
-import { getPosts, getFlatPosts, getTags } from './get-posts'
+import { getPosts, getTags } from './get-posts'
  
 export const metadata = {
   title: 'Posts'
@@ -8,8 +8,8 @@ export const metadata = {
  
 export default async function PostsPage() {
   const tags = await getTags()
-  const posts = await getFlatPosts()
-  const allTags = Object.create(null)
+  const posts = await getPosts()
+  const allTags: Record<string, number> = Object.create(null)
  
   for (const tag of tags) {
     allTags[tag] ??= 0
