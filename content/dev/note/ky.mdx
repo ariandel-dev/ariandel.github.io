@@ -1,0 +1,28 @@
+---
+author: ariandel
+date: 2025-02-13
+description: "fetch library 소개"
+tags: ["javascript"]
+title: "ky 라이브러리"
+---
+
+[링크](https://github.com/sindresorhus/ky)
+많이쓰는 axios보다 많이 가벼운 모양이다.
+
+```js {4-9}
+import ky from 'ky';
+
+const api = ky.extend({
+	hooks: {
+		beforeRequest: [
+			request => {
+				request.headers.set('X-Requested-With', 'ky');
+			}
+		]
+	}
+});
+
+const response = await api.get('https://example.com/api/users');
+```
+이렇게 hook도 추가할수 있는것같은데 나중에 많이 애용하자.
+

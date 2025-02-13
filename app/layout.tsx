@@ -22,13 +22,13 @@ export default async function RootLayout({ children }) {
  
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head backgroundColor={{ dark: '#061f0c', light: '#fefce8' }} />
+      <Head backgroundColor={{ dark: '#1a1918', light: '#fefce8' }} />
       <body>
         <Layout>
           <Navbar pageMap={await getPageMap()}>
             <NavbarLink key="/" href="/">About</NavbarLink>
             <NavbarLink key="/posts" href="/posts">Posts</NavbarLink>
-            <Search />
+            <Search placeholder='포스트 검색...' />
             <ThemeSwitch />
           </Navbar>
  
