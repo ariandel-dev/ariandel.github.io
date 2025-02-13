@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from 'next-view-transitions'
 import { PostCard } from 'nextra-theme-blog'
 import { getPosts, getTags } from './get-posts'
  
