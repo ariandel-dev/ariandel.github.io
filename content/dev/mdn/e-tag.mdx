@@ -1,0 +1,19 @@
+---
+author: ariandel
+date: 2025-02-14
+description: "google drive api사용하다 etag를 활용해보았다"
+tags: ["web"]
+title: "etag 사용기"
+---
+
+google drive에서 폴더 내부 내용이 바뀌면 변경사항을 db에 업데이트하는 작업을 할 일이 있었다.
+[mdn](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match)을 보니 If-None-Match 헤더를 활용해서 네트워크 요청의 캐싱, 변경사항을 관리하는 것 같았다.
+
+구글 드라이브 api도 이걸 사용해서 파일 변경사항이 없으면 동일한 etag를 리턴해주는 것 같았고
+이 경우 네트워크 요청을 줄일 수 있기 때문에 활용해보기로 했다.
+
+### 여담
+
+mdn 문서를보니 Etag로 변경사항을 완벽하게 추적할 수는 없는것같다.
+바이트단위로 완벽하게 일치하지 않아도 변경사항이 없는것으로 판단하는 경우가 있다고한다.
+
